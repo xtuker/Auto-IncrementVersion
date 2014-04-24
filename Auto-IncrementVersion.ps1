@@ -2,13 +2,13 @@ function Auto-IncrementVersion
 {
 <# 
 .SYNOPSIS 
-Автоматическое инкрементирование версии проектов Visual C++
+Auto-Increment of project version Visual C++
  
 .PARAMETER RCFileName 
-Имя файла ресурсов (*.rc)
+Resource file name (*.rc)
  
 .PARAMETER NewVersion 
-Установить версию файла вручную. Формат: 1.2.3.4
+Set manual version. Format: 1.2.3.4
  
 .EXAMPLE 
 Auto-IncrementVersion MyProject.rc
@@ -40,7 +40,7 @@ BEGIN {
 	
 	if($Silent -eq $false){
 		[System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
-		$ret = [System.Windows.Forms.MessageBox]::Show("Вы действительно хотите обновить версию проекта перед сборкой?" , "Внимание" , 4)
+		$ret = [System.Windows.Forms.MessageBox]::Show("Are you sure want to update the version of the project?" , "Attention" , 4)
 		if($ret -ne "YES"){ exit -1 }
 	}
 	$version = ""
