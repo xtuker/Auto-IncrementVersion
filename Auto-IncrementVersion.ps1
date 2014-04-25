@@ -44,99 +44,96 @@ BEGIN {
 		if($ret -ne "YES"){ exit -1 }
 	}
 	$version = ""
-}
 
-PROCESS {
+	$content = cat $RCFileName
+	if($content -eq $false){ exit -1 }
 
-$content = cat $RCFileName
-if($content -eq $false){ exit -1 }
+	$content | foreach{
+		if($_.Contains("FILEVERSION")){
+			$id = $_.IndexOf("FILEVERSION") + "FILEVERSION".Length
+			$left = $_.Substring(0, $id)
+			
+			if($NewVersion){
+				[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
+				[int]$MajLVer = $NewVersion.split('.')[-3]
+				[int]$MinHVer = $NewVersion.split('.')[-2]
+				[int]$MinLVer = $NewVersion.split('.')[-1]
+			}else{		
+				[int]$MajHVer = $_.split(',')[-4].split(' ')[-1]
+				[int]$MajLVer = $_.split(',')[-3]
+				[int]$MinHVer = $_.split(',')[-2]
+				[int]$MinLVer = $_.split(',')[-1]
+				
+				$MinLVer += 1
+			}
+			
+			"$left $MajHVer,$MajLVer,$MinHVer,$MinLVer"
+		}elseif($_.Contains("PRODUCTVERSION")){
+			$id = $_.IndexOf("PRODUCTVERSION") + "PRODUCTVERSION".Length
+			$left = $_.Substring(0, $id)
+			
+			if($NewVersion){
+				[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
+				[int]$MajLVer = $NewVersion.split('.')[-3]
+				[int]$MinHVer = $NewVersion.split('.')[-2]
+				[int]$MinLVer = $NewVersion.split('.')[-1]
+			}else{		
+				[int]$MajHVer = $_.split(',')[-4].split(' ')[-1]
+				[int]$MajLVer = $_.split(',')[-3]
+				[int]$MinHVer = $_.split(',')[-2]
+				[int]$MinLVer = $_.split(',')[-1]
+				
+				$MinLVer += 1
+			}
+			
+			"$left $MajHVer,$MajLVer,$MinHVer,$MinLVer"
+		}elseif($_.Contains("""FileVersion"",")){
+			$id = $_.IndexOf("""FileVersion"",") + """FileVersion"",".Length
+			$left = $_.Substring(0, $id)
+			
+			if($NewVersion){
+				[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
+				[int]$MajLVer = $NewVersion.split('.')[-3]
+				[int]$MinHVer = $NewVersion.split('.')[-2]
+				[int]$MinLVer = $NewVersion.split('.')[-1]
+			}else{
+				[int]$MajHVer = $_.split('.')[-4].split('"')[-1]
+				[int]$MajLVer = $_.split('.')[-3]
+				[int]$MinHVer = $_.split('.')[-2]
+				[int]$MinLVer = $_.split('.')[-1].split('"')[0]
+				
+				$MinLVer += 1
+			}
 
-$content | foreach{
-	if($_.Contains("FILEVERSION")){
-		$id = $_.IndexOf("FILEVERSION") + "FILEVERSION".Length
-		$left = $_.Substring(0, $id)
-		
-		if($NewVersion){
-			[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
-			[int]$MajLVer = $NewVersion.split('.')[-3]
-			[int]$MinHVer = $NewVersion.split('.')[-2]
-			[int]$MinLVer = $NewVersion.split('.')[-1]
-		}else{		
-			[int]$MajHVer = $_.split(',')[-4].split(' ')[-1]
-			[int]$MajLVer = $_.split(',')[-3]
-			[int]$MinHVer = $_.split(',')[-2]
-			[int]$MinLVer = $_.split(',')[-1]
+			"$left ""$MajHVer.$MajLVer.$MinHVer.$MinLVer"""
+		}elseif($_.Contains("""ProductVersion"",")){
+			$id = $_.IndexOf("""ProductVersion"",") + """ProductVersion"",".Length
+			$left = $_.Substring(0, $id)
 			
-			$MinLVer += 1
-		}
-		
-		"$left $MajHVer,$MajLVer,$MinHVer,$MinLVer"
-	}elseif($_.Contains("PRODUCTVERSION")){
-		$id = $_.IndexOf("PRODUCTVERSION") + "PRODUCTVERSION".Length
-		$left = $_.Substring(0, $id)
-		
-		if($NewVersion){
-			[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
-			[int]$MajLVer = $NewVersion.split('.')[-3]
-			[int]$MinHVer = $NewVersion.split('.')[-2]
-			[int]$MinLVer = $NewVersion.split('.')[-1]
-		}else{		
-			[int]$MajHVer = $_.split(',')[-4].split(' ')[-1]
-			[int]$MajLVer = $_.split(',')[-3]
-			[int]$MinHVer = $_.split(',')[-2]
-			[int]$MinLVer = $_.split(',')[-1]
+			if($NewVersion){
+				[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
+				[int]$MajLVer = $NewVersion.split('.')[-3]
+				[int]$MinHVer = $NewVersion.split('.')[-2]
+				[int]$MinLVer = $NewVersion.split('.')[-1]
+			}else{
+				[int]$MajHVer = $_.split('.')[-4].split('"')[-1]
+				[int]$MajLVer = $_.split('.')[-3]
+				[int]$MinHVer = $_.split('.')[-2]
+				[int]$MinLVer = $_.split('.')[-1].split('"')[0]
+				
+				$MinLVer += 1
+			}
+			$version = "$MajHVer.$MajLVer.$MinHVer.$MinLVer"
 			
-			$MinLVer += 1
+			"$left ""$MajHVer.$MajLVer.$MinHVer.$MinLVer"""
+		}else{ 
+			$_ 
 		}
-		
-		"$left $MajHVer,$MajLVer,$MinHVer,$MinLVer"
-	}elseif($_.Contains("""FileVersion"",")){
-		$id = $_.IndexOf("""FileVersion"",") + """FileVersion"",".Length
-		$left = $_.Substring(0, $id)
-		
-		if($NewVersion){
-			[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
-			[int]$MajLVer = $NewVersion.split('.')[-3]
-			[int]$MinHVer = $NewVersion.split('.')[-2]
-			[int]$MinLVer = $NewVersion.split('.')[-1]
-		}else{
-			[int]$MajHVer = $_.split('.')[-4].split('"')[-1]
-			[int]$MajLVer = $_.split('.')[-3]
-			[int]$MinHVer = $_.split('.')[-2]
-			[int]$MinLVer = $_.split('.')[-1].split('"')[0]
-			
-			$MinLVer += 1
-		}
+	} | Out-File $RCFileName -Encoding Default
 
-		"$left ""$MajHVer.$MajLVer.$MinHVer.$MinLVer"""
-	}elseif($_.Contains("""ProductVersion"",")){
-		$id = $_.IndexOf("""ProductVersion"",") + """ProductVersion"",".Length
-		$left = $_.Substring(0, $id)
-		
-		if($NewVersion){
-			[int]$MajHVer = $NewVersion.split('.')[-4].split(' ')[-1]
-			[int]$MajLVer = $NewVersion.split('.')[-3]
-			[int]$MinHVer = $NewVersion.split('.')[-2]
-			[int]$MinLVer = $NewVersion.split('.')[-1]
-		}else{
-			[int]$MajHVer = $_.split('.')[-4].split('"')[-1]
-			[int]$MajLVer = $_.split('.')[-3]
-			[int]$MinHVer = $_.split('.')[-2]
-			[int]$MinLVer = $_.split('.')[-1].split('"')[0]
-			
-			$MinLVer += 1
-		}
-		$version = "$MajHVer.$MajLVer.$MinHVer.$MinLVer"
-		
-		"$left ""$MajHVer.$MajLVer.$MinHVer.$MinLVer"""
-	}else{ 
-		$_ 
-	}
-} | Out-File $RCFileName -Encoding Default
-}
-END {
-echo "=========================" ""
-echo "New version: $version"
-echo "" "========================="
+	echo "=========================" ""
+	echo "New version: $version"
+	echo "" "========================="
+
 }
 }
